@@ -1,14 +1,26 @@
-# Artefacts de build PHPForge OS
+# Sorties de build
 build/
-*.iso
-*.img
-*.qcow2
-vmlinuz*
-initramfs*
-bzImage*
-rootfs*
+dist/
+output/
 
-# Environnements locaux
-.cache/
-.qemu/
+# Artefacts noyau (P1)
+linux-*/
+*.tar.xz
+*.tar.gz
+vmlinux
+bzImage
+
+# Images disque (P2+)
+*.qcow2
+*.img
+*.iso
+*.raw
+
+# mkimage (P2)
+aports/
+
+# Éditeurs / OS
 .DS_Store
+*.swp
+.idea/
+.vscode/

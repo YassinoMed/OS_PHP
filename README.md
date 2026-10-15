@@ -1,67 +1,51 @@
 # PHPForge OS
 
-**PHPForge OS** est une distribution Linux légère conçue pour les développeurs
-PHP / Laravel. Elle vise un système bootable (UEFI, x86_64) contenant tout
-l'outillage nécessaire pour développer, tester et servir des applications
-PHP modernes — sans ballast inutile.
+Distribution Linux légère pour développeurs PHP/Laravel : noyau mainline
+x86_64, base Alpine (musl), stack PHP/Composer/Nginx, outils Laravel,
+bureau Xfce, et un gestionnaire intégré (`PHPForge Manager`).
 
-## Objectifs
+## Démarrage rapide
 
-| Objectif | Détail |
-|----------|--------|
-| Léger    | Base [Alpine Linux](https://alpinelinux.org/) construite avec `mkimage`, noyau Linux LTS compilé sur mesure |
-| Complet  | PHP-CLI/FPM, Composer, Nginx, SQLite, MariaDB, PostgreSQL, Redis, Node, Git |
-| Moderne  | Laravel installable et fonctionnel out-of-the-box (`laravel new` + `migrate`) |
-| Outilé   | `phpforge` : gestionnaire intégré (versions de PHP, services, vhosts) |
-| Portable | Testé sur QEMU, VirtualBox, VMware et matériel réel Intel/AMD |
+```sh
+make help    # liste des cibles
+make lint    # shellcheck sur tous les scripts
+make check   # lint + arborescence + outils requis par phase
+make build   # build P0 : manifeste versionné (build/manifest.txt)
+make test    # tests de la phase courante
+make clean   # suppression des artefacts
+```
 
-## Arborescence du dépôt
+Le même pipeline tourne en CI : `.github/workflows/ci.yml`.
+
+## Arborescence
 
 ```
 OS_PHP/
-├── DECISIONS.md          # Décisions d'architecture (à lire en premier)
-├── PROGRESS.md           # Phases + journal des itérations
-├── Makefile              # lint / build / test / clean
-├── .github/workflows/    # CI : shellcheck + build + tests
-├── scripts/              # Scripts shell du projet (shellcheck strict)
-│   ├── check-environment.sh
-│   └── build.sh
-├── config/               # Configs : kernel, mkimage, paquets, services
-│   ├── kernel/           #   P1 : config noyau + build-kernel.sh
-│   ├── alpine/           #   P2 : profil mkimage (aports)
-│   ├── php/              #   P3/P4 : PHP, Composer, Nginx, SGBD
-│   └── manager/          #   P6 : phpforge manager
-├── tests/                # Tests exécutables (make test)
-├── docs/                 # Documentation
-└── build/                # Sorties de build (ignoré par git)
+├── Makefile            Cibles principales (lint, check, build, test)
+├── VERSION             Version courante (semver X.Y.Z)
+├── kernel/             P1 — config et build du noyau (config/kernel/)
+├── console/            P2 — image console Alpine bootable (config/alpine/)
+├── php/                P3 — stack PHP (PHP-CLI/FPM, Composer, Nginx)
+├── laravel/            P4 — outils Laravel (Node, MariaDB, PostgreSQL, Redis)
+├── desktop/            P5 — bureau Xfce et applications
+├── manager/            P6 — PHPForge Manager (config/manager/)
+├── installer/          P7 — installateur et branding
+├── compat/             P8 — matrices de compatibilité (QEMU, VirtualBox…)
+├── buildroot/          P9 (optionnel) — variante appliance Buildroot
+├── config/             Configurations versionnées (kernel, alpine, php, manager)
+├── scripts/            Scripts du pipeline : lint.sh, check-tree.sh,
+│                       check-environment.sh, build.sh
+├── tests/              Tests par phase (test_p0.sh, …)
+├── docs/               Documentation (ARCHITECTURE.md)
+├── build/              Artefacts locaux (ignoré par git)
+└── .github/workflows/  CI : lint + build + test
 ```
 
-## Prérequis
+## Feuille de route
 
-- `git`, `make`, `bash` (≥ 4 conseillé ; les scripts sont compatibles bash 3.2+)
-- `shellcheck` (pour `make lint`)
-- Les outils de build de chaque phase sont vérifiés par :
-
-```sh
-./scripts/check-environment.sh
-```
-
-## Utilisation
-
-```sh
-make help      # liste des cibles
-make lint      # shellcheck sur tous les scripts
-make build     # validation + génération de build/manifest.txt
-make test      # suite de tests
-make clean     # nettoie build/
-```
-
-## Développement itératif
-
-Le projet avance par itérations : **une seule tâche de `PROGRESS.md` par
-itération**, livrable complet, aucune case cochée sans preuve (commande
-exécutée + sortie attendue). Voir `PROGRESS.md` pour le détail et le journal.
+Voir `PROGRESS.md` (phases P0 → P9, une case cochée par itération avec
+preuve) et `DECISIONS.md` (décisions structurantes justifiées).
 
 ## Licence
 
-Projet PFE — voir `LICENSE`.
+MIT — voir `LICENSE`.

@@ -6,24 +6,20 @@ on:
   pull_request:
 
 jobs:
-  lint:
-    name: lint (shellcheck)
+  p0:
+    name: lint + build + test (P0)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: shellcheck
+      - name: lint
         run: |
           shellcheck --version
           make lint
-
-  build:
-    name: build (pipeline local)
-    runs-on: ubuntu-24.04
-    needs: lint
-    steps:
-      - uses: actions/checkout@v4
-      - run: make build
+      - name: build
+        run: make build
+      - name: test
+        run: make test
       - uses: actions/upload-artifact@v4
         with:
-          name: build-report
-          path: build/report.txt
+          name: build-manifest
+          path: build/manifest.txt

@@ -81,7 +81,7 @@ GIT_DIRTY=""
 if git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     GIT_COMMIT="$(git -C "$REPO_ROOT" rev-parse HEAD)"
     GIT_BRANCH="$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD)"
-    if [[ -n "$(git -C "$REPO_ROOT" status --porcelain)"" ]]; then
+    if [[ -n "$(git -C "$REPO_ROOT" status --porcelain)" ]]; then
         GIT_DIRTY=" (workdir sale)"
     fi
 fi
@@ -96,7 +96,19 @@ hash_file() {
     fi
 }
 
-log "Génération de ${MANIFEST#${REPO_ROOT}/} ..."
+# Liste des fichiers du dépôt : fichiers suivis par git si possible,
+# sinon tous les fichiers hors build/ et .git/.
+list_files() {
+    if git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
+       && [[ -n "$(git -C "$REPO_ROOT" ls-files)" ]]; then
+        git -C "$REPO_ROOT" ls-files
+    else
+        find . -path ./build -prune -o -path ./.git -prune -o -type f -print \
+            | sed 's|^\./||'
+    fi
+}
+
+log "Génération de ${MANIFEST#"${REPO_ROOT}"/} ..."
 mkdir -p "$BUILD_DIR"
 {
     echo "phpforge-os build manifest"
@@ -108,28 +120,14 @@ mkdir -p "$BUILD_DIR"
     echo "git-commit : ${GIT_COMMIT}${GIT_DIRTY}"
     echo "shell      : bash ${BASH_VERSION}"
     echo ""
-    echo "Contenu du dépôt (chemin  sha256) :"
-    # Fichiers suivis par git si possible, sinon tous les fichiers hors build/.
-    if git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
-       && [[ -n "$(git -C "$REPO_ROOT" ls-files)" ]]; then
-        git -C "$REPO_ROOT" ls-files
-    else
-        find "$REPO_ROOT" -path "$REPO_ROOT/build" -prune -o \
-             -path "$REPO_ROOT/.git" -prune -o -type f -print
-    fi
-} | while IFS= read -r f; do
-    if [[ "$f" == */* ]]; then
-        # Ligne de contenu du dépôt : hasher le fichier listé.
-        if [[ -f "$REPO_ROOT/$f" ]]; then
-            printf '%s  %s\n' "$(hash_file "$REPO_ROOT/$f")" "$f"
-        fi
-    else
-        # Ligne d'en-tête du manifeste : la recopier telle quelle.
-        printf '%s\n' "$f"
-    fi
-done > "$MANIFEST"
+    echo "Contenu du dépôt (sha256  chemin) :"
+} > "$MANIFEST"
 
-readonly MANIFEST_LINES
+while IFS= read -r f; do
+    [[ -f "$f" ]] || continue
+    printf '%s  %s\n' "$(hash_file "$f")" "$f"
+done < <(list_files) >> "$MANIFEST"
+
 MANIFEST_LINES="$(wc -l < "$MANIFEST" | tr -d '[:space:]')"
 log "Manifeste généré : ${MANIFEST} (${MANIFEST_LINES} lignes)."
 
