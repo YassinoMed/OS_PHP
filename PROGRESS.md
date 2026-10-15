@@ -59,11 +59,16 @@ résultat avec preuves, prochain risque.)_
     l'arbre ; fusion sur la structure granulaire (`scripts/*.sh`), suppression
     des doublons (`ci/local.sh`, `scripts/validate-tree.sh`, `scripts/lib/`),
     correction SC2295 dans `scripts/build.sh`.
-- **Preuves** (commandes exécutées, sorties réelles) :
+  - Corrections de cohérence post-fusion : `docs/ARCHITECTURE.md` ne
+    référence plus `ci/local.sh` (supprimé) et n'attribue plus le build
+    Docker à D004 (la question du daemon Docker reste ouverte pour P1) ;
+    `.cache/` (préparatifs P1 re-téléchargeables) ignoré dans `.gitignore`.
+- **Preuves** (commandes exécutées, sorties réelles — revalidées sur l'état
+  final consolidé) :
   - `make lint` → `shellcheck : 5 script(s) analysé(s), 0 échec(s).`
   - `make check` → `Arborescence conforme.` + `Environnement OK pour la phase
     courante (P0).` (3 outils P0 OK ; QEMU/wget en WARN P2, normal à ce stade)
-  - `make build` → `Manifeste généré : …/build/manifest.txt (19 lignes).` +
+  - `make build` → `Manifeste généré : …/build/manifest.txt (38 lignes).` +
     `BUILD P0 RÉUSSI.`
   - `make test` → `TOUS LES TESTS P0 SONT PASSÉS.` (T1 à T7 PASS)
 - **Prochain risque** : Docker CLI présent mais daemon arrêté sur l'hôte de

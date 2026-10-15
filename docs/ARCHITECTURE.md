@@ -15,10 +15,12 @@ testable indépendamment :
 
 ## Principes
 
-1. **Un pipeline unique** : `make lint|check|build|test` en local
-   (`ci/local.sh`), identique en CI (`.github/workflows/ci.yml`).
-2. **Builds reproductibles** : noyau et images compilés dans des conteneurs
-   Docker Linux x86_64 (décision D004), jamais nativement sur l'hôte.
+1. **Un pipeline unique** : `make lint|check|build|test`, identique en local
+   et en CI (`.github/workflows/ci.yml`).
+2. **Builds reproductibles** : le noyau (P1) et les images (P2+) seront
+   compilés dans un environnement Linux x86_64 reproductible (conteneur ou
+   VM) — décision à trancher au début de P1, car le daemon Docker de
+   l'hôte de dev est KO (voir journal P0).
 3. **Preuve avant coche** : chaque phase coche une case de `PROGRESS.md`
    avec la commande exécutée et sa sortie réelle.
 4. **Config déclarative** : les répertoires `config/` regroupent les

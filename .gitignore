@@ -19,6 +19,10 @@ bzImage
 # mkimage (P2)
 aports/
 
+# Caches locaux (ex : .cache/x86_64_defconfig, .cache/check-config.sh
+# téléchargés pour préparation P1 — re-téléchargeables, épinglés en P1)
+.cache/
+
 # Éditeurs / OS
 .DS_Store
 *.swp
