@@ -1,0 +1,14 @@
+# Artefacts de build PHPForge OS
+build/
+*.iso
+*.img
+*.qcow2
+vmlinuz*
+initramfs*
+bzImage*
+rootfs*
+
+# Environnements locaux
+.cache/
+.qemu/
+.DS_Store
