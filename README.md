@@ -49,3 +49,4 @@ preuve) et `DECISIONS.md` (décisions structurantes justifiées).
 ## Licence
 
 MIT — voir `LICENSE`.
+# OS_PHP
